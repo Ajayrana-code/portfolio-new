@@ -9,11 +9,44 @@ import contactRoutes from './routes/contactRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import admAuthRoutes from './routes/admAuthRoutes.js';
 import imageRoutes from './routes/imageRoutes.js';
+import mongoose from 'mongoose';
+//import cookieParser from 'cookie-parser';
  
 
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+const requiredEnvVars = [
+  'CLIENT_URL',
+  'MONGO_URI',
+  'JWT_SECRET',
+  'CLOUDINARY_CLOUD_NAME',
+  'CLOUDINARY_API_KEY',
+  'CLOUDINARY_API_SECRET'
+];
+
+const missingEnvVars = requiredEnvVars.filter(
+  (key) => !process.env[key]?.trim()
+);
+
+if (missingEnvVars.length > 0) {
+  console.error(
+    `Missing required environment variables: ${missingEnvVars.join(', ')}`
+  );
+  process.exit(1);
+}
+
+// Validate frontend URL
+try {
+  const clientUrl = new URL(process.env.CLIENT_URL);
+
+  if (!['http:', 'https:'].includes(clientUrl.protocol)) {
+    throw new Error('Invalid protocol');
+  }
+} catch {
+  console.error('CLIENT_URL must be a valid HTTP or HTTPS URL.');
+  process.exit(1);
+}
 
 app.use(helmet());
 
@@ -25,6 +58,9 @@ app.use(
 );
 
 app.use(express.json({ limit: '10kb' }));
+// app.use(express.json({ limit: '10kb' }));
+// app.use(cookieParser());
+
 
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -40,10 +76,14 @@ const apiLimiter = rateLimit({
 app.use('/api', apiLimiter);
 
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Portfolio API is running successfully.',
-    database: 'connected',
+  const isDatabaseConnected = mongoose.connection.readyState === 1;
+
+  res.status(isDatabaseConnected ? 200 : 503).json({
+    success: isDatabaseConnected,
+    message: isDatabaseConnected
+      ? 'Portfolio API is running successfully.'
+      : 'Database connection is unavailable.',
+    database: isDatabaseConnected ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString()
   });
 });

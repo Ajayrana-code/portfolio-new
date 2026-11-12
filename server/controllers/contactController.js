@@ -1,10 +1,10 @@
 import Contact from '../models/Contact.js';
 
+
 export const submitContact = async (req, res) => {
   try {
     const { name, email, subject, message } = req.body ?? {};
 
-    // Check that all required fields are provided as strings.
     const fields = [name, email, subject, message];
 
     if (
@@ -18,20 +18,50 @@ export const submitContact = async (req, res) => {
       });
     }
 
-    // Save the message in MongoDB.
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanSubject = subject.trim();
+    const cleanMessage = message.trim();
+
+    // Validate field lengths before database insertion.
+    if (
+      cleanName.length < 2 ||
+      cleanName.length > 80 ||
+      cleanEmail.length > 254 ||
+      cleanSubject.length < 3 ||
+      cleanSubject.length > 120 ||
+      cleanMessage.length < 10 ||
+      cleanMessage.length > 3000
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'One or more fields have an invalid length.'
+      });
+    }
+
+    // Basic email format validation.
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid email address.'
+      });
+    }
+
     await Contact.create({
-      name: name.trim(),
-      email: email.trim(),
-      subject: subject.trim(),
-      message: message.trim()
+      name: cleanName,
+      email: cleanEmail,
+      subject: cleanSubject,
+      message: cleanMessage
     });
 
     return res.status(201).json({
       success: true,
       message: 'Your message has been received successfully.'
     });
+
   } catch (error) {
-    // Mongoose schema validation errors.
     if (error.name === 'ValidationError') {
       return res.status(400).json({
         success: false,
@@ -50,6 +80,7 @@ export const submitContact = async (req, res) => {
     });
   }
 };
+
 
 // Get all contact messages for the admin dashboard.
 export const getAdminMessages = async (req, res) => {

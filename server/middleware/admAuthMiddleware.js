@@ -1,37 +1,55 @@
-
 import jwt from 'jsonwebtoken';
 import Admin from '../models/Admin.js';
 
 const authMiddleware = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  const tokenMatch = authHeader?.match(/^Bearer\s+(\S+)$/i);
+
+  if (!tokenMatch) {
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication required.'
+    });
+  }
+
+  let decoded;
+
+  // Verify JWT
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required.'
-      });
-    }
-
-    const token = authHeader.split(' ')[1];
-
-    const decoded = jwt.verify(
-      token,
+    decoded = jwt.verify(
+      tokenMatch[1],
       process.env.JWT_SECRET,
       {
         issuer: 'portfolio-api',
-        audience: 'portfolio-admin'
+        audience: 'portfolio-admin',
+        algorithms: ['HS256']
       }
     );
+  } catch {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid or expired authentication token.'
+    });
+  }
 
-    if (!decoded.sub || decoded.role !== 'admin') {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid authentication token.'
-      });
-    }
+  // Validate token payload
+  if (
+    !decoded ||
+    typeof decoded !== 'object' ||
+    !decoded.sub ||
+    decoded.role !== 'admin'
+  ) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid authentication token.'
+    });
+  }
 
-    const admin = await Admin.findById(decoded.sub).select('_id role isActive');
+  // Verify admin account
+  try {
+    const admin = await Admin.findById(decoded.sub)
+      .select('_id role isActive');
 
     if (!admin || !admin.isActive || admin.role !== 'admin') {
       return res.status(401).json({
@@ -45,12 +63,13 @@ const authMiddleware = async (req, res, next) => {
       role: admin.role
     };
 
-    next();
-
+    return next();
   } catch (error) {
-    return res.status(401).json({
+    console.error('Admin authentication lookup failed:', error.message);
+
+    return res.status(503).json({
       success: false,
-      message: 'Invalid or expired authentication token.'
+      message: 'Authentication service is temporarily unavailable.'
     });
   }
 };

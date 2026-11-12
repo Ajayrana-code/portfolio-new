@@ -116,7 +116,7 @@ function ProjectManagement() {
         <p className="project-management__error" role="alert">
           {error}
         </p>
-      )}
+      )} 
 
       {!loading && !error && projects.length === 0 && (
         <div className="project-management__empty">

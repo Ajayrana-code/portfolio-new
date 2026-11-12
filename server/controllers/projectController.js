@@ -35,6 +35,86 @@ const pickProjectFields = (body) => {
   return projectData;
 };
 
+const validateProjectPayload = (body, isCreate = false) => {
+  if (
+    !body ||
+    typeof body !== 'object' ||
+    Array.isArray(body)
+  ) {
+    return 'Request body must be a JSON object.';
+  }
+
+const allowedKeys = [...allowedFields, 'slug'];
+
+  const unknownFields = Object.keys(body).filter(
+    (key) => !allowedKeys.includes(key)
+  );
+
+  if (unknownFields.length > 0) {
+    return `Unexpected project fields: ${unknownFields.join(', ')}`;
+  }
+
+  const stringFields = [
+    'slug',
+    'number',
+    'title',
+    'subtitle',
+    'category',
+    'roleLabel',
+    'visual',
+    'symbol',
+    'visualLabel',
+    'description',
+    'overview',
+    'contribution',
+    'liveUrl',
+    'githubUrl',
+    'backgroundImage'
+  ];
+
+  for (const field of stringFields) {
+    if (
+      Object.hasOwn(body, field) &&
+      typeof body[field] !== 'string'
+    ) {
+      return `${field} must be a string.`;
+    }
+  }
+
+  const arrayFields = ['highlights', 'technologies'];
+
+  for (const field of arrayFields) {
+    if (
+      Object.hasOwn(body, field) &&
+      (
+        !Array.isArray(body[field]) ||
+        !body[field].every(item => typeof item === 'string')
+      )
+    ) {
+      return `${field} must be an array of strings.`;
+    }
+  }
+
+  if (
+    Object.hasOwn(body, 'isPublished') &&
+    typeof body.isPublished !== 'boolean'
+  ) {
+    return 'isPublished must be a boolean.';
+  }
+
+  if (
+    Object.hasOwn(body, 'sortOrder') &&
+    (
+      typeof body.sortOrder !== 'number' ||
+      !Number.isFinite(body.sortOrder)
+    )
+  ) {
+    return 'sortOrder must be a valid number.';
+  }
+
+  return null;
+};
+
 const handleProjectError = (res, error, action) => {
   console.error(`${action} error:`, error);
 
@@ -149,7 +229,19 @@ export const getAdminProjects = async (req, res) => {
 // ADMIN: Create a project.
 export const createProject = async (req, res) => {
   try {
-    const projectData = pickProjectFields(req.body ?? {});
+    const validationError = validateProjectPayload(
+      req.body,
+      true
+    );
+
+    if (validationError) {
+      return res.status(400).json({
+        success: false,
+        message: validationError
+      });
+    }
+
+    const projectData = pickProjectFields(req.body);
 
     if (
       typeof req.body?.slug !== 'string' ||
@@ -183,7 +275,16 @@ export const createProject = async (req, res) => {
 // ADMIN: Update an existing project.
 export const updateProject = async (req, res) => {
   try {
-    const projectData = pickProjectFields(req.body ?? {});
+    const validationError = validateProjectPayload(req.body);
+
+    if (validationError) {
+      return res.status(400).json({
+        success: false,
+        message: validationError
+      });
+    }
+
+    const projectData = pickProjectFields(req.body);
 
     if (Object.keys(projectData).length === 0) {
       return res.status(400).json({

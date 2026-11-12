@@ -20,7 +20,8 @@ const uploadProjectImage = async (req, res) => {
         {
           folder: 'portfolio/projects',
           resource_type: 'image',
-          allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'avif']
+          allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'avif'],
+          timeout: 30000
         },
         (error, uploadResult) => {
           if (error) {
@@ -34,6 +35,13 @@ const uploadProjectImage = async (req, res) => {
       uploadStream.end(req.file.buffer);
     });
 
+          if (
+        !result?.secure_url ||
+        !result.secure_url.startsWith('https://') ||
+        !result.public_id
+      ) {
+        throw new Error('Invalid Cloudinary upload response.');
+      }
     return res.status(201).json({
       success: true,
       message: 'Project image uploaded successfully.',
@@ -45,14 +53,21 @@ const uploadProjectImage = async (req, res) => {
         height: result.height
       }
     });
-  } catch (error) {
-    console.error('Project image upload error:', error);
+    } catch (error) {
+      if (error.code === 'INVALID_IMAGE_SIGNATURE') {
+        return res.status(400).json({
+          success: false,
+          message: error.message
+        });
+      }
 
-    return res.status(500).json({
-      success: false,
-      message: 'Image upload failed. Please try again.'
-    });
-  }
+      console.error('Project image upload error:', error);
+
+      return res.status(502).json({
+        success: false,
+        message: 'Image upload failed. Please try again.'
+      });
+    }
 };
 
 export { uploadProjectImage };

@@ -55,8 +55,9 @@ export const loginAdmin = async (req, res) => {
       {
         subject: admin._id.toString(),
         expiresIn: process.env.JWT_EXPIRES_IN || '1d',
-        issuer: 'portfolio-api',
-        audience: 'portfolio-admin'
+            issuer: 'portfolio-api',
+            audience: 'portfolio-admin',
+            algorithm: 'HS256'
       }
     );
 

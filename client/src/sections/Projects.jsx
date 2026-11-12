@@ -4,7 +4,8 @@ import { projectCategories } from '../data/projects';
 import './Projects.css';
 
 const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function Projects() {
   const [projects, setProjects] = useState([]);
@@ -358,7 +359,7 @@ function Projects() {
                 )}
 
                 {selectedProject.githubUrl && (
-                  <a
+                  <a 
                     href={selectedProject.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"

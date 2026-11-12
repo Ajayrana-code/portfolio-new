@@ -8,7 +8,7 @@ const router = express.Router();
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  limit: 50,
+  limit: 6,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: {
