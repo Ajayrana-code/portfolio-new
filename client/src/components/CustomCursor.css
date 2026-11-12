@@ -1,0 +1,111 @@
+
+/* Hide the native cursor only when the custom cursor is active */
+body.custom-cursor-enabled,
+body.custom-cursor-enabled * {
+  cursor: none !important;
+}
+
+/* Keep the custom cursor above the portfolio content */
+.custom-cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Outer subtle transparent ring */
+.custom-cursor__outer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    width 0.25s ease,
+    height 0.25s ease,
+    border-color 0.25s ease,
+    opacity 0.2s ease;
+  will-change: transform;
+}
+
+.custom-cursor__outer.is-visible {
+  opacity: 1;
+}
+
+/* Inner glowing dot */
+.custom-cursor__inner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 10px rgba(255, 255, 255, 0.65),
+    0 0 18px rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    width 0.2s ease,
+    height 0.2s ease,
+    opacity 0.2s ease;
+  will-change: transform;
+}
+
+.custom-cursor__inner.is-visible {
+  opacity: 1;
+}
+
+/* Subtle hover effect on links and buttons */
+.custom-cursor__outer.is-hovering {
+  width: 50px;
+  height: 50px;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.custom-cursor__inner.is-hovering {
+  width: 6px;
+  height: 6px;
+}
+
+/* Click ripple */
+.custom-cursor__outer.is-clicking::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: cursor-click-ripple 0.55s ease-out forwards;
+}
+
+@keyframes cursor-click-ripple {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .custom-cursor__outer,
+  .custom-cursor__inner {
+    transition: none;
+  }
+
+  .custom-cursor__outer.is-clicking::after {
+    animation-duration: 0.25s;
+  }
+}

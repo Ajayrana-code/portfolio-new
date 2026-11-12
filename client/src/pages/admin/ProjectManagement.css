@@ -1,0 +1,423 @@
+
+.project-management {
+  min-height: 100vh;
+  padding: clamp(24px, 5vw, 55px);
+  background: #090b09;
+  color: #f4f5ef;
+}
+
+/* Header */
+
+.project-management__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.project-management__back {
+  display: inline-block;
+  color: #a0a695;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.project-management__back:hover {
+  color: #c6ff63;
+}
+
+.project-management__header h1 {
+  margin: 22px 0 8px;
+  font-size: clamp(28px, 5vw, 38px);
+  letter-spacing: -1.3px;
+}
+
+.project-management__header p {
+  margin: 0;
+  color: #92988a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* Animated Add Project link */
+
+.project-management__add {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 13px 20px;
+  border: 1px solid #c6ff63;
+  border-radius: 8px;
+  background: #c6ff63;
+  color: #10140a;
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.2px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 0 0 rgba(198, 255, 99, 0);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease,
+    color 220ms ease;
+}
+
+.project-management__add::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.45) 48%,
+    transparent 75%
+  );
+  transform: translateX(-120%);
+  transition: transform 550ms ease;
+}
+
+.project-management__add:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 24px rgba(198, 255, 99, 0.16),
+    0 0 0 4px rgba(198, 255, 99, 0.07);
+}
+
+.project-management__add:hover::before {
+  transform: translateX(120%);
+}
+
+.project-management__add:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+.project-management__add:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 4px;
+}
+
+/* Summary */
+
+.project-management__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 280px;
+  margin: 28px 0;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px;
+  background: #11140f;
+  color: #a3a99b;
+  font-size: 12px;
+}
+
+.project-management__summary strong {
+  color: #c6ff63;
+  font-size: 23px;
+}
+
+/* Project list */
+
+.project-management__list {
+  display: grid;
+  gap: 14px;
+}
+
+.project-management__card {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 11px;
+  background: #11140f;
+  transition:
+    transform 220ms ease,
+    border-color 220ms ease,
+    background 220ms ease;
+}
+
+.project-management__card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(198, 255, 99, 0.25);
+  background: #141912;
+}
+
+/* Project visual */
+
+.project-management__visual {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 105px;
+  height: 85px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #20271b;
+  color: #c6ff63;
+  font-size: 30px;
+}
+
+.project-management__visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 350ms ease;
+}
+
+.project-management__card:hover .project-management__visual img {
+  transform: scale(1.07);
+}
+
+/* Project details */
+
+.project-management__details {
+  flex: 1;
+  min-width: 0;
+}
+
+.project-management__category {
+  color: #c6ff63;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.project-management__details h2 {
+  margin: 8px 0 5px;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.project-management__details p {
+  margin: 0;
+  color: #92988a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.project-management__technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.project-management__technologies span {
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: #20251d;
+  color: #aab19f;
+  font-size: 9px;
+}
+
+/* Publishing status */
+
+.project-management__status {
+  flex-shrink: 0;
+}
+
+.project-management__published,
+.project-management__unpublished {
+  display: inline-block;
+  padding: 7px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.project-management__published {
+  background: rgba(198, 255, 99, 0.09);
+  color: #c6ff63;
+}
+
+.project-management__unpublished {
+  background: rgba(255, 184, 77, 0.1);
+  color: #ffbd66;
+}
+
+/* Loading, empty and error states */
+
+.project-management__message,
+.project-management__empty {
+  padding: 35px 20px;
+  color: #92988a;
+  text-align: center;
+  font-size: 13px;
+}
+
+.project-management__error {
+  padding: 14px;
+  border: 1px solid rgba(255, 100, 100, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 70, 70, 0.07);
+  color: #ff8585;
+  font-size: 13px;
+}
+
+/* Tablet and mobile */
+
+@media (max-width: 650px) {
+  .project-management {
+    padding: 28px 16px;
+  }
+
+  .project-management__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .project-management__add {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .project-management__card {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  .project-management__visual {
+    width: 75px;
+    height: 70px;
+  }
+
+  .project-management__details {
+    flex-basis: calc(100% - 90px);
+  }
+
+  .project-management__status {
+    width: 100%;
+  }
+}
+
+/* Accessibility */
+
+@media (hover: none) {
+  .project-management__card:hover {
+    transform: none;
+  }
+
+  .project-management__add:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-management *,
+  .project-management *::before,
+  .project-management *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.project-management__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.project-management__edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  padding: 9px 18px;
+  border: 1px solid var(--color-accent, #c4f05b);
+  border-radius: 8px;
+  color: var(--color-accent, #c4f05b);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.project-management__edit:hover {
+  background: var(--color-accent, #c4f05b);
+  color: #111;
+}
+
+.project-management__edit:focus-visible {
+  outline: 2px solid var(--color-accent, #c4f05b);
+  outline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+  .project-management__actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-management__edit {
+    transition: none;
+  }
+}
+
+.project-management__buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.project-management__delete {
+  min-width: 76px;
+  padding: 9px 18px;
+  border: 1px solid #e45b5b;
+  border-radius: 8px;
+  background: transparent;
+  color: #e45b5b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.project-management__delete:hover:not(:disabled) {
+  background: #e45b5b;
+  color: #fff;
+}
+
+.project-management__delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.project-management__delete:focus-visible {
+  outline: 2px solid #e45b5b;
+  outline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+  .project-management__buttons {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-management__delete {
+    transition: none;
+  }
+}
