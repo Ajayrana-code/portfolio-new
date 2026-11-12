@@ -16,10 +16,13 @@ import ProjectForm from './pages/admin/ProjectForm';
 
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import AdminMessages from './pages/admin/AdminMessages';
+import CustomCursor from './components/CustomCursor';
 
 function PublicPortfolio() {
   return (
     <>
+
+      <CustomCursor />
       <Navbar />
 
       <main>

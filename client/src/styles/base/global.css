@@ -63,9 +63,13 @@ ol {
   margin-inline: auto;
 }
 
-.section {
+/* .section {
   padding-block: var(--space-10);
+} */
+.section {
+  padding-block: clamp(3rem, 5vw, 4rem);
 }
+
 
 /* Accessibility */
 
