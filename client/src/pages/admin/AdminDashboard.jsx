@@ -7,34 +7,49 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function AdminDashboard() {
   const navigate = useNavigate();
-  const [projectCount, setProjectCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+    const [projectCount, setProjectCount] = useState(0);
+    const [messageCount, setMessageCount] = useState(0);
+    const [newMessageCount, setNewMessageCount] = useState(0);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const token = sessionStorage.getItem('adminToken');
+useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      const token = sessionStorage.getItem('adminToken');
 
-        const response = await fetch(`${API_URL}/api/projects`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+      const headers = {
+        Authorization: `Bearer ${token}`
+      };
 
-        const data = await response.json();
+      const [projectsResponse, messagesResponse] = await Promise.all([
+        fetch(`${API_URL}/api/projects/admin`, { headers }),
+        fetch(`${API_URL}/api/contact/admin`, { headers })
+      ]);
 
-        if (response.ok && data.success) {
-          setProjectCount(data.count ?? data.projects?.length ?? 0);
-        }
-      } catch (error) {
-        console.error('Dashboard data error:', error);
-      } finally {
-        setLoading(false);
+      const [projectsData, messagesData] = await Promise.all([
+        projectsResponse.json(),
+        messagesResponse.json()
+      ]);
+
+      if (projectsResponse.ok && projectsData.success) {
+        setProjectCount(
+          projectsData.count ?? projectsData.projects?.length ?? 0
+        );
       }
-    };
 
-    fetchDashboardData();
-  }, []);
+      if (messagesResponse.ok && messagesData.success) {
+        setMessageCount(messagesData.count ?? 0);
+        setNewMessageCount(messagesData.newCount ?? 0);
+      }
+    } catch (error) {
+      console.error('Dashboard data error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDashboardData();
+}, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem('adminToken');
@@ -54,22 +69,31 @@ function AdminDashboard() {
         <div className="admin-sidebar__section">
           <span className="admin-sidebar__label">WORKSPACE</span>
 
-          <div className="admin-sidebar__nav">
-            <div className="admin-sidebar__item active">
-              <span>▦</span>
-              Overview
-            </div>
+<div className="admin-sidebar__nav">
+  <Link
+    to="/admin"
+    className="admin-sidebar__item active"
+  >
+    <span>▦</span>
+    Overview
+  </Link>
 
-            <div className="admin-sidebar__item">
-              <span>◈</span>
-              Projects
-            </div>
+  <Link
+    to="/admin/projects"
+    className="admin-sidebar__item"
+  >
+    <span>◈</span>
+    Projects
+  </Link>
 
-            <div className="admin-sidebar__item">
-              <span>✉</span>
-              Messages
-            </div>
-          </div>
+  <Link
+    to="/admin/messages"
+    className="admin-sidebar__item"
+  >
+    <span>✉</span>
+    Messages
+  </Link>
+</div>
         </div>
 
         <div className="admin-sidebar__bottom">
@@ -124,18 +148,23 @@ function AdminDashboard() {
               {loading ? '—' : projectCount}
             </strong>
 
-            <p>Projects currently published</p>
+            <p>Projects in your portfolio</p>
           </article>
 
-          <article className="admin-stat-card">
+            <article className="admin-stat-card">
             <div className="admin-stat-card__top">
-              <span>Messages</span>
-              <span className="admin-stat-card__icon">✉</span>
+                <span>Total Messages</span>
+                <span className="admin-stat-card__icon">✉</span>
             </div>
 
-            <strong>—</strong>
-            <p>Message management coming next</p>
-          </article>
+            <strong>
+                {loading ? '—' : messageCount}
+            </strong>
+
+            <p>
+                {loading ? 'Loading messages...' : `${newMessageCount} new messages`}
+            </p>
+            </article>
 
         </section>
 
@@ -146,8 +175,7 @@ function AdminDashboard() {
             </span>
             <h3>Your workspace is ready.</h3>
             <p>
-              Project management and contact message management
-              will be available here.
+              Your projects and contact messages are ready to manage.
             </p>
           </div>
         </section>

@@ -8,6 +8,7 @@ import connectDB from './config/db.js';
 import contactRoutes from './routes/contactRoutes.js';
 import projectRoutes from './routes/projectRoutes.js';
 import admAuthRoutes from './routes/admAuthRoutes.js';
+import imageRoutes from './routes/imageRoutes.js';
  
 
 const app = express();
@@ -51,6 +52,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/contact', contactRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/auth', admAuthRoutes);
+app.use('/api/images', imageRoutes);
 
 
 app.use((req, res) => {

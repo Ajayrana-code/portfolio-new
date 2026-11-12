@@ -9,13 +9,14 @@ function ProjectManagement() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [deletingSlug, setDeletingSlug] = useState('');
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const token = sessionStorage.getItem('adminToken');
 
-        const response = await fetch(`${API_URL}/api/projects`, {
+        const response = await fetch(`${API_URL}/api/projects/admin`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -38,6 +39,45 @@ function ProjectManagement() {
     fetchProjects();
   }, []);
 
+    const handleDelete = async (project) => {
+    const confirmed = window.confirm(
+        `Are you sure you want to delete "${project.title}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+        setDeletingSlug(project.slug);
+        setError('');
+
+        const token = sessionStorage.getItem('adminToken');
+
+        const response = await fetch(
+        `${API_URL}/api/projects/${encodeURIComponent(project.slug)}`,
+        {
+            method: 'DELETE',
+            headers: {
+            Authorization: `Bearer ${token}`
+            }
+        }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+        throw new Error(data.message || 'Unable to delete project.');
+        }
+
+        setProjects((currentProjects) =>
+        currentProjects.filter((item) => item.slug !== project.slug)
+        );
+    } catch (err) {
+        setError(err.message || 'Something went wrong while deleting.');
+    } finally {
+        setDeletingSlug('');
+    }
+    };
+
   return (
     <div className="project-management">
 
@@ -52,13 +92,13 @@ function ProjectManagement() {
           <p>Manage the projects displayed on your portfolio.</p>
         </div>
 
-        <button
-          className="project-management__add"
-          disabled
-          title="Project creation will be enabled in the next step"
-        >
-          + Add Project
-        </button>
+        <Link
+            to="/admin/projects/new"
+            className="project-management__add"
+            >
+            + Add Project
+        </Link>
+
       </header>
 
       <div className="project-management__summary">
@@ -84,7 +124,7 @@ function ProjectManagement() {
         </div>
       )}
 
-      {!loading && !error && projects.length > 0 && (
+      {!loading && projects.length > 0 && (
         <div className="project-management__list">
 
           {projects.map((project) => (
@@ -119,11 +159,36 @@ function ProjectManagement() {
                 </div>
               </div>
 
-              <div className="project-management__status">
-                <span className="project-management__published">
-                  Published
+              <div className="project-management__actions">
+                <span
+                    className={
+                    project.isPublished
+                        ? 'project-management__published'
+                        : 'project-management__unpublished'
+                    }
+                >
+                    {project.isPublished ? 'Published' : 'Unpublished'}
                 </span>
-              </div>
+
+                <div className="project-management__buttons">
+                    <Link
+                    to={`/admin/projects/${encodeURIComponent(project.slug)}/edit`}
+                    className="project-management__edit"
+                    >
+                    Edit
+                    </Link>
+
+                    <button
+                    type="button"
+                    className="project-management__delete"
+                    onClick={() => handleDelete(project)}
+                    disabled={deletingSlug === project.slug}
+                    >
+                    {deletingSlug === project.slug ? 'Deleting...' : 'Delete'}
+                    </button>
+                </div>
+              </div> 
+
             </article>
           ))}
 

@@ -50,3 +50,146 @@ export const submitContact = async (req, res) => {
     });
   }
 };
+
+// Get all contact messages for the admin dashboard.
+export const getAdminMessages = async (req, res) => {
+  try {
+    const [messages, total, newCount] = await Promise.all([
+      Contact.find().sort({ createdAt: -1 }),
+      Contact.countDocuments(),
+      Contact.countDocuments({ status: 'new' })
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      count: total,
+      newCount,
+      messages
+    });
+  } catch (error) {
+    console.error('Get messages error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to fetch messages.'
+    });
+  }
+};
+
+// Get one contact message by ID.
+export const getAdminMessageById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!Contact.db.base.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid message ID.'
+      });
+    }
+
+    const message = await Contact.findById(id);
+
+    if (!message) {
+      return res.status(404).json({
+        success: false,
+        message: 'Message not found.'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message
+    });
+  } catch (error) {
+    console.error('Get message error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to fetch this message.'
+    });
+  }
+};
+
+// Update a message's status.
+export const updateMessageStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body ?? {};
+
+    if (!Contact.db.base.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid message ID.'
+      });
+    }
+
+    if (!['new', 'read', 'replied'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid message status.'
+      });
+    }
+
+    const message = await Contact.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    );
+
+    if (!message) {
+      return res.status(404).json({
+        success: false,
+        message: 'Message not found.'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Message status updated.',
+      data: message
+    });
+  } catch (error) {
+    console.error('Update message status error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to update message status.'
+    });
+  }
+};
+
+// Delete a contact message.
+export const deleteMessage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!Contact.db.base.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid message ID.'
+      });
+    }
+
+    const message = await Contact.findByIdAndDelete(id);
+
+    if (!message) {
+      return res.status(404).json({
+        success: false,
+        message: 'Message not found.'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Message deleted successfully.'
+    });
+  } catch (error) {
+    console.error('Delete message error:', error);
+
+    return res.status(500).json({
+      success: false,
+      message: 'Unable to delete message.'
+    });
+  }
+};

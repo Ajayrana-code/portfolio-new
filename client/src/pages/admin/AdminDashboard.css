@@ -292,6 +292,8 @@
     gap: 6px;
     padding: 11px 5px;
     font-size: 11px;
+    text-decoration: none;
+    color: inherit;
   }
 
   .admin-sidebar__bottom {
