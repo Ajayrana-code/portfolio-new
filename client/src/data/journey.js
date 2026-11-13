@@ -6,7 +6,7 @@ export const education = [
     shortName: 'MCA',
     institution: 'Jharkhand Rai University',
     location: 'Jharkhand, India',
-    period: 'Completed · July 2022',
+    period: 'Completed · July 2024',
     score: '8.76',
     scoreLabel: 'CGPA',
     description:
@@ -19,7 +19,7 @@ export const education = [
     shortName: 'BCA',
     institution: 'Vinoba Bhave University',
     location: 'Jharkhand, India',
-    period: 'Completed · October 2019',
+    period: 'Completed · October 2021',
     score: '8.37',
     scoreLabel: 'CGPA',
     description:
